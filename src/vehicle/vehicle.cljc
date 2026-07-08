@@ -206,7 +206,9 @@
         kind (int-array nb) min-ratio (double-array nb) max-ratio (double-array nb)
         rest-mul (double-array nb)
         deform-limit (double-array nb) break-limit (double-array nb) max-plastic (double-array nb)
-        plastic-strain (double-array nb) broken (boolean-array nb) current-length (double-array nb)]
+        plastic-strain (double-array nb)
+        broken #_:clj-kondo/ignore (boolean-array nb)
+        current-length (double-array nb)]
     (dotimes [i nb]
       (let [b (nth beams i) bt (:beam-type b) k (kind->code (:kind bt))
             mul (case (:kind bt)

@@ -4,8 +4,7 @@
    ADR-2607010930.
 
    A vec3 is represented as a plain map `{:x _ :y _ :z _}` for portability
-   across CLJ/CLJS/babashka without any external dependency."
-  #?(:cljs (:refer-clojure :exclude [+ - * /])))
+   across CLJ/CLJS/babashka without any external dependency.")
 
 (defn v3
   ([] {:x 0.0 :y 0.0 :z 0.0})
