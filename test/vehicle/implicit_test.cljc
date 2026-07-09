@@ -29,3 +29,20 @@
         (let [forces [v3/zero v3/zero]
               [nodes' _iters] (implicit/implicit-step nodes [b] forces dt state)]
           (recur nodes' state (inc i)))))))
+
+(deftest pressured-beam-defaults-to-reference-pressure-not-zero
+  ;; implicit-step's inner reduce calls
+  ;; (beam/live-rest-length b (get-in b [:beam-type :reference-pressure] 0.0))
+  ;; -- previously it hardcoded pressure=0.0 unconditionally, which for a
+  ;; :pressured beam produced a permanently shrunk rest length regardless of
+  ;; actual tire pressure. Confirm the extraction pulls the beam's own
+  ;; reference-pressure (so the adjustment term is exactly 0, matching a
+  ;; healthy/un-punctured tire) rather than defaulting to 0.0.
+  (let [b (-> (beam/new-beam 0 0 1 0.30 5000.0 50.0)
+              (beam/with-type (beam/beam-type-pressured 0.05 2.4)))
+        default-b (beam/new-beam 0 0 1 0.30 5000.0 50.0)]
+    (is (= 2.4 (get-in b [:beam-type :reference-pressure] 0.0)))
+    (is (= 0.30 (beam/live-rest-length b (get-in b [:beam-type :reference-pressure] 0.0))))
+    ;; non-:pressured beams are unaffected: the fallback 0.0 is a no-op since
+    ;; live-rest-length's case dispatch never reads the pressure arg for them.
+    (is (= 0.30 (beam/live-rest-length default-b (get-in default-b [:beam-type :reference-pressure] 0.0))))))
