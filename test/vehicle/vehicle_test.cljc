@@ -36,6 +36,28 @@
         dist (v3/length (v3/sub (:position (nth (:nodes v) 1)) (:position (nth (:nodes v) 0))))]
     (is (< (Math/abs (- dist 1.0)) 0.02))))
 
+(deftest pressured-beam-settles-at-reference-pressure-rest-length
+  ;; The default (:xpbd) simulation path precomputes each beam's rest-length
+  ;; multiplier once at build time. No live tire pressure is tracked, so a
+  ;; :pressured beam (used for tire sidewalls) must settle at its own
+  ;; effective-length at reference pressure -- not a permanently shrunk
+  ;; value (a prior bug shrank every tire sidewall by
+  ;; pressure-factor*reference-pressure regardless of actual pressure).
+  (let [v (veh/new-vehicle "pressured-pair")
+        v (veh/add-node v (-> (node/new-node 0 v3/zero 1.0) (node/with-friction 0.0) (node/with-drag 0.0)))
+        v (veh/add-node v (-> (node/new-node 1 (v3/v3 0.30 0.0 0.0) 1.0) (node/with-friction 0.0) (node/with-drag 0.0)))
+        k 5000.0 m 1.0
+        d (* 2.0 (Math/sqrt (* k m)))
+        bm (-> (beam/new-beam 0 0 1 0.30 k d)
+               (beam/with-type (beam/beam-type-pressured 0.05 2.4))
+               (assoc :deform {:deform-limit 5.0 :break-limit 10.0 :max-plastic-strain 0.0}))
+        v (veh/add-beam v bm)
+        v (assoc-in v [:integrator :gravity] v3/zero)
+        g (ground/flat-ground -100.0)
+        v (reduce (fn [c _] (veh/step c (/ 1.0 60.0) g)) v (range 200))
+        dist (v3/length (v3/sub (:position (nth (:nodes v) 1)) (:position (nth (:nodes v) 0))))]
+    (is (< (Math/abs (- dist 0.30)) 0.02))))
+
 (deftest anchor-node-does-not-move
   (let [v (veh/new-vehicle "anchor")
         v (veh/add-node v (node/anchor 0 (v3/v3 0.0 1.0 0.0)))

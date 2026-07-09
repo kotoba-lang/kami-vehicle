@@ -211,9 +211,16 @@
         current-length (double-array nb)]
     (dotimes [i nb]
       (let [b (nth beams i) bt (:beam-type b) k (kind->code (:kind bt))
+            ;; :pressured's live-rest-length multiplier is
+            ;; 1.0 + pressure-factor*(pressure - reference-pressure) (beam.cljc);
+            ;; no live tire pressure is tracked here, so pressure defaults to
+            ;; reference-pressure and the delta -- and thus the whole
+            ;; adjustment term -- is exactly 0, leaving 1.0 (no unintended
+            ;; shrink). Previously this computed (1.0 - pressure-factor *
+            ;; reference-pressure), a permanent ~12% under-length bug on
+            ;; every tire sidewall beam regardless of actual pressure.
             mul (case (:kind bt)
                   :hydro (+ 1.0 (* (double (:factor bt)) (double (:extension bt))))
-                  :pressured (- 1.0 (* (double (:pressure-factor bt)) (double (:reference-pressure bt))))
                   1.0)
             i1 (get id->idx (:n1 b) -1)
             i2 (get id->idx (:n2 b) -1)]

@@ -54,7 +54,14 @@
                (if (< len 1e-6)
                  out
                  (let [dir (v3/scale delta (/ 1.0 len))
-                       rest (beam/live-rest-length b 0.0)
+                       ;; No live tire pressure is tracked; default to each
+                       ;; beam's own reference-pressure so :pressured beams
+                       ;; get their intended no-adjustment (multiplier 1.0)
+                       ;; baseline instead of the wrong, hardcoded pressure=0
+                       ;; (which previously under-lengthened every tire
+                       ;; sidewall beam). No-op for non-:pressured kinds,
+                       ;; whose live-rest-length ignores the pressure arg.
+                       rest (beam/live-rest-length b (get-in b [:beam-type :reference-pressure] 0.0))
                        bt (:beam-type b)
                        skip? (case (:kind bt)
                                :bounded (let [ratio (/ len (max rest 1e-6))]
