@@ -17,6 +17,22 @@
     (is (= 0.0 (beam/force-scalar b 1.05 0.0 0.0)))
     (is (< (beam/force-scalar b 1.30 0.0 0.0) 0.0))))
 
+(deftest bounded-beam-force-is-continuous-at-the-boundary
+  ;; Past either edge of [min-ratio, max-ratio], the beam must pull/push
+  ;; back toward THAT EDGE, not toward the full rest length l0 -- so force
+  ;; must rise continuously from 0.0 right at the boundary, matching
+  ;; vehicle.cljc's XPBD fast path (which targets rest*ratio, not l0).
+  (let [b (-> (beam/new-beam 0 0 1 1.0 1000.0 10.0)
+              (beam/with-type (beam/beam-type-bounded 0.8 1.2)))]
+    (is (= 0.0 (beam/force-scalar b 1.2 0.0 0.0)) "exactly at the upper boundary")
+    (is (< (Math/abs (- (beam/force-scalar b 1.2001 0.0 0.0) -0.1)) 1e-2)
+        "just past the upper boundary: force must be tiny, not jump by spring*(max-ratio-1)*l0")
+    (is (< (Math/abs (- (beam/force-scalar b 1.30 0.0 0.0) -100.0)) 1e-2)
+        "well past the upper boundary: force is relative to the boundary length, not l0")
+    (is (= 0.0 (beam/force-scalar b 0.8 0.0 0.0)) "exactly at the lower boundary")
+    (is (< (Math/abs (- (beam/force-scalar b 0.7999 0.0 0.0) 0.1)) 1e-2)
+        "just past the lower boundary: force must be tiny, not jump")))
+
 (deftest hydro-beam-extends-with-control
   (let [b (-> (beam/new-beam 0 0 1 1.0 1000.0 10.0)
               (beam/with-type (beam/beam-type-hydro 0.20 1.0)))]
