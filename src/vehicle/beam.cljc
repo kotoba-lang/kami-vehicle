@@ -68,10 +68,18 @@
           damping (:damping beam)]
       (case (:kind bt)
         :bounded
+        ;; Slack inside [min-ratio, max-ratio]; past either edge the beam
+        ;; acts like a spring pulling/pushing back toward that edge (not
+        ;; toward l0), so force must rise continuously from 0.0 at the
+        ;; boundary -- matching vehicle.cljc's XPBD fast path, which
+        ;; targets (* rest ratio) rather than l0 itself.
         (let [ratio (/ current-length l0)]
-          (if (or (< ratio (:min-ratio bt)) (> ratio (:max-ratio bt)))
-            (- (- (* spring (- current-length l0))) (* damping rate))
-            0.0))
+          (cond
+            (< ratio (:min-ratio bt))
+            (- (- (* spring (- current-length (* l0 (:min-ratio bt))))) (* damping rate))
+            (> ratio (:max-ratio bt))
+            (- (- (* spring (- current-length (* l0 (:max-ratio bt))))) (* damping rate))
+            :else 0.0))
         :support
         (if (< current-length l0)
           (- (- (* spring (- current-length l0))) (* damping rate))
