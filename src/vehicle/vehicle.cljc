@@ -207,7 +207,11 @@
         rest-mul (double-array nb)
         deform-limit (double-array nb) break-limit (double-array nb) max-plastic (double-array nb)
         plastic-strain (double-array nb)
-        broken #_:clj-kondo/ignore (boolean-array nb)
+        ;; JVM has primitive boolean[]; CLJS has no `boolean-array` var. A
+        ;; fixed-size JS array is sufficient because every slot is populated
+        ;; below before the XPBD loop reads it.
+        broken #_:clj-kondo/ignore #?(:clj (boolean-array nb)
+                                      :cljs (make-array nb))
         current-length (double-array nb)]
     (dotimes [i nb]
       (let [b (nth beams i) bt (:beam-type b) k (kind->code (:kind bt))

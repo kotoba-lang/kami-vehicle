@@ -31,6 +31,24 @@
   (let [g (pt/shift-to (pt/manual-6) -1)]
     (is (< (pt/gearbox-total-ratio g) 0.0))))
 
+(deftest automatic-shift-uses-rpm-hysteresis
+  (let [first-gear (assoc (pt/manual-6) :current-gear 1 :shift-progress 1.0)
+        second-gear (pt/automatic-shift first-gear 6300.0 {:speed-kph 12.0})
+        settled-second (assoc second-gear :shift-progress 1.0)]
+    (is (= 2 (:current-gear second-gear)))
+    (is (= 0.0 (:shift-progress second-gear)))
+    (is (= 1 (:current-gear (pt/automatic-shift settled-second 2100.0 {:speed-kph 5.0}))))
+    (is (= 2 (:current-gear (pt/automatic-shift settled-second 4000.0 {:speed-kph 12.0}))))))
+
+(deftest automatic-shift-obeys-gear-limits-and-active-shift
+  (let [top (assoc (pt/manual-6) :current-gear 6 :shift-progress 1.0)
+        shifting (assoc (pt/manual-6) :current-gear 2 :shift-progress 0.5)]
+    (is (= 6 (:current-gear (pt/automatic-shift top 7000.0 {:speed-kph 120.0}))))
+    (is (= shifting (pt/automatic-shift shifting 7000.0 {:speed-kph 120.0})))
+    (is (= 1 (:current-gear
+              (pt/automatic-shift (assoc (pt/manual-6) :current-gear 1 :shift-progress 1.0)
+                                  7000.0 {:speed-kph 3.0}))))))
+
 (deftest open-diff-splits-evenly
   (let [d (pt/diff-open)
         [l r] (pt/diff-split d 100.0 10.0 12.0)]
