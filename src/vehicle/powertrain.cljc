@@ -116,6 +116,36 @@
     (update gearbox :shift-progress #(min 1.0 (+ % (/ dt (:shift-time gearbox)))))
     gearbox))
 
+(defn automatic-shift
+  "Select a forward gear using RPM and road-speed hysteresis. Requiring both
+  high RPM and the current gear's minimum road speed prevents clutch/free-rev
+  gear hunting. Shifts only after the previous shift has completed.
+
+  Options: `:speed-kph`, `:up-rpm` (6200), `:down-rpm` (2200), and authored
+  `:upshift-kph` / `:downshift-kph` vectors."
+  ([gearbox rpm] (automatic-shift gearbox rpm {}))
+  ([gearbox rpm {:keys [speed-kph up-rpm down-rpm upshift-kph downshift-kph]
+                 :or {speed-kph 0.0 up-rpm 6200.0 down-rpm 2200.0
+                      ;; Conservative defaults for the restored soft-body demo:
+                      ;; its tire/chassis losses are much higher than a rigid-body car.
+                      upshift-kph [8.0 14.0 24.0 38.0 58.0]
+                      downshift-kph [6.0 11.0 19.0 31.0 48.0]}}]
+   (let [gear (:current-gear gearbox)
+         max-forward (- (count (:ratios gearbox)) 2)
+         up-speed (nth upshift-kph (max 0 (dec gear)) ##Inf)
+         down-speed (nth downshift-kph (max 0 (- gear 2)) 0.0)]
+     (if (< (:shift-progress gearbox) 1.0)
+       gearbox
+       (cond
+         (and (>= gear 1) (< gear max-forward)
+              (>= rpm up-rpm) (>= speed-kph up-speed))
+         (shift-to gearbox (inc gear))
+
+         (and (> gear 1) (or (<= rpm down-rpm) (< speed-kph down-speed)))
+         (shift-to gearbox (dec gear))
+
+         :else gearbox)))))
+
 ;; ---- Differential ----
 ;; kind: {:kind :open} | {:kind :locked} | {:kind :lsd :lock-factor f}
 
