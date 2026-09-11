@@ -50,7 +50,7 @@ Each `src/vehicle/**.cljc` namespace has a matching test namespace under
 `test/`. Run with:
 
 ```sh
-clojure -M:test
+kbb -M:test
 ```
 
 Current status: **56 tests, 131 assertions, 0 failures, 0 errors.**
