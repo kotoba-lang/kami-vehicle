@@ -1,6 +1,6 @@
 (ns vehicle.integrator-test
   "Ported 1:1 from kami-vehicle's `src/integrator.rs` `#[cfg(test)] mod tests`."
-  (:require [clojure.test :refer [deftest is]]
+  (:require [kotoba.test :refer [deftest is]]
             [vehicle.integrator :as integrator]))
 
 (deftest substeps-at-60hz-use-about-34-steps

@@ -1,6 +1,6 @@
 (ns vehicle.rigid-chassis-test
   "Ported 1:1 from kami-vehicle's `src/rigid_chassis.rs` `#[cfg(test)] mod tests`."
-  (:require [clojure.test :refer [deftest is]]
+  (:require [kotoba.test :refer [deftest is]]
             [vehicle.rigid-chassis :as rc]
             [vehicle.vec3 :as v3]))
 

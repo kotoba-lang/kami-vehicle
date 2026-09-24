@@ -1,6 +1,6 @@
 (ns vehicle.implicit-test
   "Ported 1:1 from kami-vehicle's `src/implicit.rs` `#[cfg(test)] mod tests`."
-  (:require [clojure.test :refer [deftest is]]
+  (:require [kotoba.test :refer [deftest is]]
             [vehicle.implicit :as implicit]
             [vehicle.node :as node]
             [vehicle.beam :as beam]

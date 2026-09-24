@@ -1,5 +1,5 @@
 (ns vehicle.backend-test
-  (:require [clojure.test :refer [deftest is]] [kotoba.physics.contract :as contract]
+  (:require [kotoba.test :refer [deftest is]] [kotoba.physics.contract :as contract]
             [kotoba.physics.vehicle :as shared] [vehicle.backend :as backend]))
 (deftest backend-instantiates-shared-document
   (let [doc (shared/document {:id :sports :preset :sports})

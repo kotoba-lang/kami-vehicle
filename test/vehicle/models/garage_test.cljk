@@ -1,6 +1,6 @@
 (ns vehicle.models.garage-test
   "Ported 1:1 from kami-vehicle's `src/models/garage.rs` `#[cfg(test)] mod tests`."
-  (:require [clojure.test :refer [deftest is]]
+  (:require [kotoba.test :refer [deftest is]]
             [vehicle.models.garage :as garage]
             [vehicle.ground :as ground]
             [vehicle.vehicle :as veh]))
