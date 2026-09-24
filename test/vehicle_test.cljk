@@ -3,7 +3,7 @@
    plus the `#[cfg(test)] mod integration_tests` ported 1:1 from
    kami-vehicle's `src/lib.rs`, plus a port of the README \"Quick start\"
    doctest."
-  (:require [clojure.test :refer [deftest is]]
+  (:require [kotoba.test :refer [deftest is]]
             [vehicle]
             [vehicle.models.sedan :as sedan]
             [vehicle.models.garage :as garage]

@@ -1,6 +1,6 @@
 (ns vehicle.builder-test
   "Ported 1:1 from kami-vehicle's `src/builder.rs` `#[cfg(test)] mod tests`."
-  (:require [clojure.test :refer [deftest is]]
+  (:require [kotoba.test :refer [deftest is]]
             [vehicle.builder :as builder]
             [vehicle.node :as node]
             [vehicle.wheel :as wheel]

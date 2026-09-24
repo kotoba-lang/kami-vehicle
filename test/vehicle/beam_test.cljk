@@ -1,6 +1,6 @@
 (ns vehicle.beam-test
   "Ported 1:1 from kami-vehicle's `src/beam.rs` `#[cfg(test)] mod tests`."
-  (:require [clojure.test :refer [deftest is]]
+  (:require [kotoba.test :refer [deftest is]]
             [vehicle.beam :as beam]))
 
 (deftest normal-beam-relaxed-has-zero-force

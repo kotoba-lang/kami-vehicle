@@ -4,7 +4,7 @@
    The original tests parse a JSON literal via serde; this port passes the
    equivalent already-parsed EDN map directly to `load-edn` (see the
    namespace docstring on `vehicle.jbeam` for the rationale)."
-  (:require [clojure.test :refer [deftest is]]
+  (:require [kotoba.test :refer [deftest is]]
             [vehicle.jbeam :as jbeam]))
 
 (def sample

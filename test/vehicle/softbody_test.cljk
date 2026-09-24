@@ -1,5 +1,5 @@
 (ns vehicle.softbody-test
-  (:require [clojure.test :refer [deftest is]]
+  (:require [kotoba.test :refer [deftest is]]
             [vehicle.softbody :as softbody]
             [vehicle.vec3 :as v3]))
 
